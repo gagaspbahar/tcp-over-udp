@@ -6,7 +6,7 @@ class Connection:
         # Init UDP socket
         pass
 
-    def send_data(self, msg : Segment, dest : ("ip", "port")):
+    def send_data(self, msg : Segment, dest : tuple['str', 'int']):
         # Send single segment into destination
         pass
 
