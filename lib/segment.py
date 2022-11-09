@@ -9,11 +9,11 @@ DEF_FLAG = 0b00000000
 class SegmentFlag:
     def __init__(self, flag : bytes):
         # Init flag variable from flag byte
-        if flag == SYN_FLAG:
+        if flag & SYN_FLAG != 0:
             self.syn = True
-        if flag == ACK_FLAG:
+        if flag & ACK_FLAG != 0:
             self.ack = True
-        if flag == FIN_FLAG:
+        if flag & FIN_FLAG != 0:
             self.fin = True
 
     def get_flag_bytes(self) -> bytes:
