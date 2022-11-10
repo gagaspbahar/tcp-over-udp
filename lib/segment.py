@@ -52,13 +52,24 @@ class Segment:
         output += f"{'Payload':24} | {self.payload}\n"
         return output
 
-    def __calculate_checksum(self) -> int:
+    def calculate_checksum(self) -> int:
         # Calculate checksum here, return checksum result
-        pass
+        sum = 0
+        data_bytes = self.get_bytes_no_checksum()
+
+        if (len(data_bytes) % 2 != 0):
+            data_bytes = b'\x00' + data_bytes
+            
+        for i in range(0, len(data_bytes), 2):
+            sum += int.from_bytes(data_bytes[i:i+2], byteorder='big')
+        while sum >> 16:
+            sum = (sum & 0xffff) + (sum >> 16)
+        return ~sum & 0xffff
 
     def update_checksum(self):
         # Update checksum value
-        self.checksum = self.__calculate_checksum()
+        self.header['checksum'] = self.calculate_checksum()
+        
 
 
     # -- Setter --
@@ -81,7 +92,6 @@ class Segment:
             self.flag = initial_flag | ACK_FLAG
         if flag_list[2]:
             self.flag = initial_flag | FIN_FLAG
-        pass
 
 
     # -- Getter --
@@ -117,8 +127,27 @@ class Segment:
         header_bytes = struct.pack('iibbh', self.header['seqNumber'], self.header['ackNumber'], self.header['flag'], DEF_FLAG, self.header['checksum'])
         return header_bytes + self.payload
 
+    def get_bytes_no_checksum(self) -> bytes:
+        # Get bytes without checksum
+        header_bytes = struct.pack('iibb', self.header['seqNumber'], self.header['ackNumber'], self.header['flag'], DEF_FLAG)
+        return header_bytes + self.payload
 
     # -- Checksum --
     def valid_checksum(self) -> bool:
         # Use __calculate_checksum() and check integrity of this object
-        pass
+        return self.calculate_checksum() == self.header['checksum']
+
+# if __name__ == '__main__':
+#     segment = Segment()
+#     segment.header['seqNumber'] = 1
+#     segment.header['ackNumber'] = 2
+#     segment.header['flag'] = SYN_FLAG
+#     segment.payload = b"Hello World"
+#     segment.update_checksum()
+#     print(segment.calculate_checksum())
+#     if segment.valid_checksum():
+#         print("Checksum valid")
+#     else:
+#         print("Checksum invalid")
+#     print(segment.get_bytes_no_checksum().hex())
+#     print(segment.get_bytes().hex())
