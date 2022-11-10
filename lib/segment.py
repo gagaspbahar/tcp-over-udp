@@ -100,11 +100,22 @@ class Segment:
     # -- Marshalling --
     def set_from_bytes(self, src : bytes):
         # From pure bytes, unpack() and set into python variable
-        pass
+        # 44112: iibbh
+        header_bytes = src[:12]
+        header_tup = struct.unpack('iibbh', header_bytes)
+        header = {
+            'seqNumber': header_tup[0],
+            'ackNumber': header_tup[1],
+            'flag': header_tup[2],
+            'checksum': header_tup[4]
+        }
+        self.header = header
+        self.payload = src[12:]
 
     def get_bytes(self) -> bytes:
         # Convert this object to pure bytes
-        pass
+        header_bytes = struct.pack('iibbh', self.header['seqNumber'], self.header['ackNumber'], self.header['flag'], DEF_FLAG, self.header['checksum'])
+        return header_bytes + self.payload
 
 
     # -- Checksum --
