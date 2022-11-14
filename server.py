@@ -81,8 +81,6 @@ class Server:
         syn = Segment()
         # Syn flag only
         syn.set_flag([True, False, False])
-        if syn.get_flag().syn:
-            self.logger.ask_log("SYNNYA KEKIRIM weh")
         self.connection.set_timeout(config.TIMEOUT)
         self.send(syn, client_addr)
 
@@ -93,12 +91,6 @@ class Server:
                 syn_ack, addr = self.connection.listen_single_segment()
                 syn_ack_flags = syn_ack.get_flag()
                 addr = Address(addr[0], addr[1])
-                if syn_ack_flags.syn:
-                    self.logger.ok_log(f"[!] Received SYN-ACK from {addr.ip}:{addr.port}")
-                if syn_ack_flags.ack:
-                    self.logger.ok_log(f"[!] Received ACK from {addr.ip}:{addr.port}")
-                if syn_ack_flags.fin:
-                    self.logger.ok_log(f"[!] Received FIN from {addr.ip}:{addr.port}")
                 if syn_ack_flags.syn and syn_ack_flags.ack:
                     self.logger.ok_log(f"[!] Received SYN-ACK from {addr.ip}:{addr.port}. Handshake phase 2 completed.")
 

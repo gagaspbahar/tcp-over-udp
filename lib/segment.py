@@ -15,10 +15,8 @@ class SegmentFlag:
         # Init flag variable from flag byte
         if flag & SYN_FLAG:
             self.syn = True
-            print("SYN")
         if flag & ACK_FLAG:
             self.ack = True
-            print("ACK")
         if flag & FIN_FLAG:
             self.fin = True
 
