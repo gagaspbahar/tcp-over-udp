@@ -8,23 +8,29 @@ DEF_FLAG = 0b00000000
 
 class SegmentFlag:
     def __init__(self, flag : bytes):
+        # Init flag
+        self.syn = False
+        self.ack = False
+        self.fin = False
         # Init flag variable from flag byte
-        if flag & SYN_FLAG != 0:
+        if flag & SYN_FLAG:
             self.syn = True
-        if flag & ACK_FLAG != 0:
+            print("SYN")
+        if flag & ACK_FLAG:
             self.ack = True
-        if flag & FIN_FLAG != 0:
+            print("ACK")
+        if flag & FIN_FLAG:
             self.fin = True
 
     def get_flag_bytes(self) -> bytes:
         # Convert this object to flag in byte form
         current_flag = DEF_FLAG
         if self.syn:
-            current_flag = DEF_FLAG | SYN_FLAG
+            current_flag |= SYN_FLAG
         if self.ack:
-            current_flag = DEF_FLAG | ACK_FLAG
+            current_flag |= ACK_FLAG
         if self.fin:
-            current_flag = DEF_FLAG | FIN_FLAG
+            current_flag |= FIN_FLAG
         return current_flag
 
 
@@ -76,7 +82,7 @@ class Segment:
     def set_header(self, header : dict):
         # Set header from dictionary
         self.header = header
-        self.update_checksum
+        self.update_checksum()
 
     def set_payload(self, payload : bytes):
         # Set payload from bytes
@@ -87,17 +93,19 @@ class Segment:
         # Set flag from list of flag (SYN, ACK, FIN)
         initial_flag = DEF_FLAG
         if flag_list[0]:
-            self.flag = initial_flag | SYN_FLAG
+            initial_flag |= SYN_FLAG
         if flag_list[1]:
-            self.flag = initial_flag | ACK_FLAG
+            initial_flag |= ACK_FLAG
         if flag_list[2]:
-            self.flag = initial_flag | FIN_FLAG
+            initial_flag |= FIN_FLAG
+        self.header['flag'] = initial_flag
+        self.update_checksum()
 
 
     # -- Getter --
     def get_flag(self) -> SegmentFlag:
         # return flag in segmentflag
-        return SegmentFlag(self.flag)
+        return SegmentFlag(self.header['flag'])
 
     def get_header(self) -> dict:
         # Return header in dictionary form
@@ -113,6 +121,8 @@ class Segment:
         # 44112: iibbh
         header_bytes = src[:12]
         header_tup = struct.unpack('iibbh', header_bytes)
+        for i in range(5):
+            print(i, header_tup[i])
         header = {
             'seqNumber': header_tup[0],
             'ackNumber': header_tup[1],
@@ -121,10 +131,11 @@ class Segment:
         }
         self.header = header
         self.payload = src[12:]
+        self.update_checksum()
 
     def get_bytes(self) -> bytes:
         # Convert this object to pure bytes
-        header_bytes = struct.pack('iibbh', self.header['seqNumber'], self.header['ackNumber'], self.header['flag'], DEF_FLAG, self.header['checksum'])
+        header_bytes = struct.pack('iibbH', self.header['seqNumber'], self.header['ackNumber'], self.header['flag'], DEF_FLAG, self.header['checksum'])
         return header_bytes + self.payload
 
     def get_bytes_no_checksum(self) -> bytes:

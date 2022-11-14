@@ -1,5 +1,7 @@
 import socket
 from .segment import Segment
+from .address import Address
+
 
 class Connection:
     def __init__(self, ip : str, port : int):
@@ -13,14 +15,19 @@ class Connection:
         # Send single segment into destination
         self.socket.sendto(msg.get_bytes(), dest)
 
-    def listen_single_segment(self) -> tuple(Segment, "tuple['str', 'int']"):
+    def listen_single_segment(self) -> tuple([Segment, Address]):
         # Listen single UDP datagram within timeout and convert into segment
         msg, addr = self.socket.recvfrom(32768)
         segment = Segment()
-        segment.set_bytes(msg)
+        print("msg: ", msg)
+        segment.set_from_bytes(msg)
         if not segment.valid_checksum():
             raise Exception("Invalid checksum.")
         return segment, addr
+    
+    def set_timeout(self, int):
+        # Set timeout for socket
+        self.socket.settimeout(int)
 
     def close_socket(self):
         # Release UDP socket
