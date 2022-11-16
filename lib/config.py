@@ -1,2 +1,4 @@
 IP_ADDRESS = 'localhost'
 TIMEOUT = 3
+WINDOW_SIZE = 5
+PAYLOAD_SIZE = 2**15 - 12

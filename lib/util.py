@@ -1,4 +1,6 @@
-DATA_LIMIT = 2**15
+import config
+
+DATA_LIMIT = config.PAYLOAD_SIZE
 
 def partition_data(data: bytes) -> list:
   array_of_data = []

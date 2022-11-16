@@ -86,6 +86,16 @@ class Segment:
         # Set payload from bytes
         self.payload = payload
         self.update_checksum()
+    
+    def set_seq_number(self, seq_number : int):
+        # Set sequence number
+        self.header['seqNumber'] = seq_number
+        self.update_checksum()
+    
+    def set_ack_number(self, ack_number : int):
+        # Set acknowledgement number
+        self.header['ackNumber'] = ack_number
+        self.update_checksum()
 
     def set_flag(self, flag_list : list):
         # Set flag from list of flag (SYN, ACK, FIN)
@@ -119,8 +129,6 @@ class Segment:
         # 44112: iibbh
         header_bytes = src[:12]
         header_tup = struct.unpack('iibbh', header_bytes)
-        for i in range(5):
-            print(i, header_tup[i])
         header = {
             'seqNumber': header_tup[0],
             'ackNumber': header_tup[1],

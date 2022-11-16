@@ -4,6 +4,7 @@ from lib.connection import Connection
 from lib.logger import Logger
 from lib.segment import Segment
 import lib.config as config
+import lib.util as util
 
 class Client:
     def __init__(self, port, server_port, path):
@@ -12,6 +13,7 @@ class Client:
         self.ip = config.IP_ADDRESS
         self.server_port = server_port
         self.filepath = path
+        self.file = []
         self.connection = Connection(self.ip, self.port)
         self.logger = Logger("Client")
         self.logger.ok_log(f"[!] Client started at port {self.port}")
@@ -46,7 +48,6 @@ class Client:
             try:
                 syn, _ = self.connection.listen_single_segment()
                 syn_flags = syn.get_flag()
-                print(syn.header['flag'])
                 if syn_flags.syn:
                     self.logger.ok_log("[!] SYN received.")
                     break
@@ -63,7 +64,6 @@ class Client:
         self.logger.ask_log("[!] Sending SYN-ACK to server..")
 
         # Phase 3: Receive ACK
-
         while True:
             try:
                 ack, _ = self.connection.listen_single_segment()
@@ -79,7 +79,58 @@ class Client:
 
     def listen_file_transfer(self):
         # File transfer, client-side
-        pass
+        self.logger.ask_log("[!] Receiving segment from server ...")
+
+        # Go Back N
+        N = config.WINDOW_SIZE
+        Rn = 0
+        Sn = 0
+        Sb = 0
+
+        while True: 
+            self.connection.set_timeout(config.TIMEOUT)
+            
+            try: 
+                file_segment, _ = self.connection.listen_single_segment()
+                Sn = file_segment.get_header()['seqNumber']
+                flag = file_segment.get_flag()
+
+                # if there is no more data from the sender (FIN flag)
+                if (flag.fin): 
+                    byte_array_received = util.join_data(self.file)
+                    file_received = open(self.filepath, "wb")
+                    file_received.write(byte_array_received)
+                    file_received.close()
+                    self.logger.ok_log("[!] File received.")
+                    ack = Segment()
+                    ack.set_flag([False, True, False])
+                    self.send(ack)
+                    self.logger.ask_log("[!] Sending ACK to server. Closing connection... Happy to know you <3")
+                    break
+                
+                # if the segment received = Rn and the segment is error free then
+                if (Sn == Rn):
+                    # Accept the segment
+                    # Send segment to a higher layer
+                    self.file.append(file_segment.get_payload())
+                    # Send ACK
+                    ack = Segment()
+                    ack.set_ack_number(Rn)
+                    ack.set_flag([False, True, False])
+                    
+                    # Rn := Rn + 1
+                    Rn += 1
+                else:
+                    # Refuse segment
+                    self.logger.warning_log(f"[!] Segment number {Sn} refused. Expected number: {Rn}. Timing out..")
+
+                # Send acknowledgement for last received segment
+                self.send(ack)
+                    
+            
+            except Exception as e:
+                self.logger.warning_log(f"[!] {e}")
+        
 
 
 if __name__ == '__main__':

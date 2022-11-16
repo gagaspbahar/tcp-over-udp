@@ -19,7 +19,6 @@ class Connection:
         # Listen single UDP datagram within timeout and convert into segment
         msg, addr = self.socket.recvfrom(32768)
         segment = Segment()
-        print("msg: ", msg)
         segment.set_from_bytes(msg)
         if not segment.valid_checksum():
             raise Exception("Invalid checksum.")
