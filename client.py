@@ -108,11 +108,17 @@ class Client:
                     self.logger.ask_log("[!] Sending ACK to server. Closing connection... Happy to know you <3")
                     break
                 
-                # if the segment received = Rn and the segment is error free then
-                if (Sn == Rn):
+                # if the segment received less than or equal to Rn and the segment is error free then
+                if (Sn <= Rn):
                     # Accept the segment
                     # Send segment to a higher layer
-                    self.file.append(file_segment.get_payload())
+                    last_received = len(self.file) - 1
+
+                    # Handle file order when ACK Lost
+                    if (last_received == Sn - 1):
+                        self.file.append(file_segment.get_payload())
+                        self.logger.ask_log(f"[!] Segment {Sn} received and added to buffer.")
+                        
                     # Send ACK
                     ack = Segment()
                     ack.set_ack_number(Rn)
@@ -121,7 +127,7 @@ class Client:
                     # Rn := Rn + 1
                     self.logger.ask_log(f"[!] Sending ACK to server. Request number = {Rn}")
                     self.send(ack)
-                    Rn += 1
+                    Rn = Sn + 1
 
                 else:
                     # Refuse segment
