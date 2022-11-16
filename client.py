@@ -121,11 +121,11 @@ class Client:
                         
                     # Send ACK
                     ack = Segment()
-                    ack.set_ack_number(Rn)
+                    ack.set_ack_number(Sn)
                     ack.set_flag([False, True, False])
                     
                     # Rn := Rn + 1
-                    self.logger.ask_log(f"[!] Sending ACK to server. Request number = {Rn}")
+                    self.logger.ask_log(f"[!] Sending ACK to server. Sequence number = {Sn}")
                     self.send(ack)
                     Rn = Sn + 1
 
