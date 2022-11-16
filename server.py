@@ -175,25 +175,29 @@ class Server:
         
     def close_connection(self, client_addr : Address):
         # Send FIN to client
-        self.logger.ask_log(f"[!] Sending FIN to {client_addr.ip}:{client_addr.port}")
-        fin = Segment()
-        fin.set_flag([False, False, True])
-        self.send(fin, client_addr)
-        self.logger.ask_log(f"[!] Waiting for ACK from {client_addr.ip}:{client_addr.port}")
-        try:
-            ack, addr = self.connection.listen_single_segment()
-            ack_flags = ack.get_flag()
-            addr = Address(addr[0], addr[1])
-            if ack_flags.ack:
-                self.logger.ok_log(f"[!] Received ACK from {addr.ip}:{addr.port}")
-            else:
-                self.logger.warning_log(f"[!] Received invalid segment from {addr.ip}:{addr.port}")
-                self.logger.warning_log(f"[!] Exiting..")
-                raise Exception("Invalid segment received")
-        except Exception as e:
-            self.logger.warning_log(f"[!] {e}")
-            self.logger.warning_log("[!] ACK not received. Exiting..")
-            return
+        while True:
+            self.logger.ask_log(f"[!] Sending FIN to {client_addr.ip}:{client_addr.port}")
+            fin = Segment()
+            fin.set_flag([False, False, True])
+            self.send(fin, client_addr)
+            self.logger.ask_log(f"[!] Waiting for ACK from {client_addr.ip}:{client_addr.port}")
+            try:
+                ack, addr = self.connection.listen_single_segment()
+                ack_flags = ack.get_flag()
+                addr = Address(addr[0], addr[1])
+                if ack_flags.ack:
+                    self.logger.ok_log(f"[!] Received ACK from {addr.ip}:{addr.port}")
+                else:
+                    self.logger.warning_log(f"[!] Received invalid segment from {addr.ip}:{addr.port}")
+                    self.logger.warning_log(f"[!] Exiting..")
+                    raise Exception("Invalid segment received")
+            except socket.timeout:
+                self.logger.warning_log(f"[!] {client_addr.ip}:{client_addr.port} timed out. Resending FIN")
+                continue
+            except Exception as e:
+                self.logger.warning_log(f"[!] {e}")
+                self.logger.warning_log("[!] ACK not received. Exiting..")
+                return
             
 
 
