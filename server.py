@@ -20,6 +20,7 @@ class Server:
 
     def listen_for_clients(self):
         # Waiting client for connect
+        self.clients = []
         try:
             while True:
                 self.logger.ask_log("[!] Waiting for client to connect...")
