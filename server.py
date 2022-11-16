@@ -126,6 +126,7 @@ class Server:
                     raise Exception("Invalid segment received")
             except socket.timeout:
                 self.logger.warning_log(f"[!] {client_addr.ip}:{client_addr.port} timed out")
+                segment_number = segment_base
                 continue
             except Exception as e:
                 self.logger.warning_log(f"[!] {e}")
