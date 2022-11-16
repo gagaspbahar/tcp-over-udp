@@ -119,9 +119,10 @@ class Client:
                     ack.set_flag([False, True, False])
                     
                     # Rn := Rn + 1
-                    Rn += 1
+                    self.logger.ask_log(f"[!] Sending ACK to server. Request number = {Rn}")
                     self.send(ack)
-                    
+                    Rn += 1
+
                 else:
                     # Refuse segment
                     self.logger.warning_log(f"[!] Segment number {Sn} refused. Expected number: {Rn}. Timing out..")

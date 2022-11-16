@@ -109,17 +109,17 @@ class Server:
                 self.logger.ask_log(f"[!] Sending segment {segment_number} to client {client_addr.ip}:{client_addr.port}")
                 segment_number += 1
 
-            # Receive ACK
+            # Receive SYN-ACK
             self.connection.set_timeout(config.TIMEOUT)
             try:
-                ack, addr = self.connection.listen_single_segment()
-                ack_flags = ack.get_flag()
+                synack, addr = self.connection.listen_single_segment()
+                synack_flags = synack.get_flag()
                 addr = Address(addr[0], addr[1])
-                ack_number = ack.get_header()['ackNumber']
-                if ack_flags.ack:
-                    self.logger.ok_log(f"[!] Received ACK from {addr.ip}:{addr.port}")
+                synack_number = synack.get_header()['ackNumber']
+                if synack_flags.ack and synack_flags.syn:
+                    self.logger.ok_log(f"[!] Received SYN-ACK from {addr.ip}:{addr.port}")
                     
-                    segment_base = ack_number
+                    segment_base = synack_number
                     sequence_max = segment_base + (N - 1)
                     if segment_base + 1 == segment_count:
                         break
