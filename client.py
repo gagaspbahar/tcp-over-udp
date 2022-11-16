@@ -120,12 +120,13 @@ class Client:
                     
                     # Rn := Rn + 1
                     Rn += 1
+                    self.send(ack)
+                    
                 else:
                     # Refuse segment
                     self.logger.warning_log(f"[!] Segment number {Sn} refused. Expected number: {Rn}. Timing out..")
 
                 # Send acknowledgement for last received segment
-                self.send(ack)
                     
             
             except Exception as e:
