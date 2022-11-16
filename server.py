@@ -20,26 +20,30 @@ class Server:
 
     def listen_for_clients(self):
         # Waiting client for connect
-        while True:
-            self.logger.ask_log("[!] Waiting for client to connect...")
-            seg, addr = self.connection.listen_single_segment()
-            addr = Address(addr[0], addr[1])
-            self.logger.ask_log(f"[!] Received request from client {addr.ip}:{addr.port}")
-            # Echo
-            self.connection.send_data(seg, addr.tuple())
-            self.clients.append(addr)
-            self.logger.ask_log("[?] Listen more? (y/n)")
-            if input() == "y":
-                continue
-            else:
-                break
-        if len(self.clients):
-            self.logger.ok_log(f"[!] {len(self.clients)} clients connected.")
-            self.logger.ok_log("Client list:")
-            for i in range(len(self.clients)):
-                print(f"{i+1}. {self.clients[i].ip}:{self.clients[i].port}")
-            self.start_file_transfer()
-        
+        try:
+            while True:
+                self.logger.ask_log("[!] Waiting for client to connect...")
+                self.connection.set_timeout(99999)
+                seg, addr = self.connection.listen_single_segment()
+                addr = Address(addr[0], addr[1])
+                self.logger.ask_log(f"[!] Received request from client {addr.ip}:{addr.port}")
+                # Echo
+                self.connection.send_data(seg, addr.tuple())
+                self.clients.append(addr)
+                self.logger.ask_log("[?] Listen more? (y/n)")
+                if input() == "y":
+                    continue
+                else:
+                    break
+            if len(self.clients):
+                self.logger.ok_log(f"[!] {len(self.clients)} clients connected.")
+                self.logger.ok_log("Client list:")
+                for i in range(len(self.clients)):
+                    print(f"{i+1}. {self.clients[i].ip}:{self.clients[i].port}")
+                self.start_file_transfer()
+        except socket.timeout:
+            self.logger.warning_log("[!] Timeout. Exiting...")
+            return
 
     # Server kirim file ke client
     def send(self, segment: Segment, address: Address):
