@@ -1,4 +1,4 @@
-import config
+import lib.config as config
 
 DATA_LIMIT = config.PAYLOAD_SIZE
 
