@@ -54,7 +54,9 @@ class Client:
                 else:
                     self.logger.warning_log("[!] Segment is not SYN, listening again..")
             except socket.timeout:
-                self.logger.warning_log("[!] Server timed out, listening again..")
+                self.logger.warning_log("[!] Server timed out, exiting..")
+                exit(1)
+                
         
         # Phase 2: Send SYN-ACK
         syn_ack = Segment()
@@ -74,7 +76,7 @@ class Client:
                 else:
                     self.logger.warning_log("[!] Segment is not ACK, listening again..")
             except socket.timeout:
-                self.logger.warning_log("[!] Server timed out, listening again..")
+                exit(1)
         
 
     def listen_file_transfer(self):
