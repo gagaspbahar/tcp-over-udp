@@ -187,6 +187,7 @@ class Server:
                 addr = Address(addr[0], addr[1])
                 if ack_flags.ack:
                     self.logger.ok_log(f"[!] Received ACK from {addr.ip}:{addr.port}")
+                    break
                 else:
                     self.logger.warning_log(f"[!] Received invalid segment from {addr.ip}:{addr.port}")
                     self.logger.warning_log(f"[!] Exiting..")
