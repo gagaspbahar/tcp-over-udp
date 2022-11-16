@@ -117,7 +117,7 @@ class Server:
                 addr = Address(addr[0], addr[1])
                 ack_number = ack.get_header()['ackNumber']
                 if ack_flags.ack:
-                    self.logger.ok_log(f"[!] Received ACK from {addr.ip}:{addr.port}")
+                    self.logger.ok_log(f"[!] Received ACK from {addr.ip}:{addr.port} with ackNumber {ack_number}")
                     
                     segment_base = ack_number
                     sequence_max = segment_base + (N - 1)
