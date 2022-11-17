@@ -128,7 +128,7 @@ class Client:
                     # Rn := Rn + 1
                     self.logger.ask_log(f"[!] Sending ACK to server. Sequence number = {Sn}")
                     self.send(ack)
-                    Rn = last_received + 1
+                    Rn = len(self.file) + 1
 
                 else:
                     # Refuse segment
