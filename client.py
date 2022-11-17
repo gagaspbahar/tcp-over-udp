@@ -125,21 +125,21 @@ class Client:
                         Rn = last_received + 1
                         
                     # Send ACK
-                    try:
-                        ack = Segment()
-                        ack.set_ack_number(Sn)
-                        ack.set_flag([False, True, False])
-                        
-                        # Rn := Rn + 1
-                        self.send(ack)
-                        self.logger.ask_log(f"[!] Sending ACK to server. Sequence number = {Sn}. Request number now = {Rn}")
-                    except socket.timeout:
-                        self.send(ack)
-                        self.logger.warning_log("[!] Server timed out, sending ack again..")
+                    ack = Segment()
+                    ack.set_ack_number(Sn)
+                    ack.set_flag([False, True, False])
+                    
+                    # Rn := Rn + 1
+                    self.send(ack)
+                    self.logger.ask_log(f"[!] Sending ACK to server. Sequence number = {Sn}. Request number now = {Rn}")
 
                 else:
                     # Refuse segment
-                    self.logger.warning_log(f"[!] Segment number {Sn} refused. Expected number: {Rn}. Timing out..")
+                    if (Rn - Sn >= N):
+                        self.logger.warning_log(f"[!] Segment {Sn} is out of window. Resending ack.. Request number now = {Rn}")
+                        self.send(ack)
+                    else:
+                        self.logger.warning_log(f"[!] Segment number {Sn} refused. Expected number: {Rn}. Timing out..")
 
                 # Send acknowledgement for last received segment
                     
