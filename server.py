@@ -183,7 +183,7 @@ class Server:
                 syn_ack, addr = self.connection.listen_single_segment()
                 syn_ack_flags = syn_ack.get_flag()
                 addr = Address(addr[0], addr[1])
-                if syn_ack_flags.syn and syn_ack_flags.ack:
+                if syn_ack_flags.syn and syn_ack_flags.ack and not syn_ack_flags.fin and addr == client_addr:
                     self.logger.ok_log(f"[!] Received SYN-ACK from {addr.ip}:{addr.port}. Handshake phase 2 completed.")
 
                     # Third phase: send ACK to client
