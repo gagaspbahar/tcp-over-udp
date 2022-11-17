@@ -110,7 +110,7 @@ class Client:
                     break
                 
                 # if the segment received less than or equal to Rn and the segment is error free then
-                if (Sn <= Rn):
+                if (Sn == Rn):
 
                     # Accept the segment
                     # Send segment to a higher layer

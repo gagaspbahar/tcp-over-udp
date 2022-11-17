@@ -47,9 +47,7 @@ class Server:
             return
 
     # Server kirim file ke client
-    def send(self, segment: Segment, address: Address):
-        if(segment.payload):
-            self.logger.ask_log("[!] Sending segment to client. . .")
+    def send(self, segment: Segment, address: Address):                                             
         self.connection.send_data(segment, address.tuple())
 
     def receive(self):
