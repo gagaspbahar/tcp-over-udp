@@ -111,9 +111,12 @@ class Client:
                 
                 # if the segment received less than or equal to Rn and the segment is error free then
                 if (Sn <= Rn):
+
                     # Accept the segment
                     # Send segment to a higher layer
                     last_received = len(self.file)
+                    print("last_received", last_received)
+                    print("Sn", Sn)
 
                     # Handle file order when ACK Lost
                     if (last_received == Sn):
