@@ -74,7 +74,7 @@ class Server:
                     self.file_transfer(client)
                 else:
                     self.logger.warning_log(f"[!] Handshake failed with {client.ip}:{client.port}")
-            self.logger.ask_log("[!] File transfer completed. Listen more? (y/n)")
+            self.logger.ask_log("[!] Listen more? (y/n)")
             if input() == "y":
                 self.listen_for_clients()
             else:
