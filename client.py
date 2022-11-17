@@ -122,6 +122,7 @@ class Client:
                     if (last_received == Sn):
                         self.file.append(file_segment.get_payload())
                         self.logger.ok_log(f"[!] Segment {Sn} received and added to buffer.")
+                        Rn = last_received + 1
                         
                     # Send ACK
                     ack = Segment()
@@ -130,7 +131,6 @@ class Client:
                     
                     # Rn := Rn + 1
                     self.send(ack)
-                    Rn = last_received + 1
                     self.logger.ask_log(f"[!] Sending ACK to server. Sequence number = {Sn}. Request number now = {Rn}")
 
                 else:
