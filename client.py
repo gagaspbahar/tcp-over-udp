@@ -23,6 +23,7 @@ class Client:
         self.connection.send_data(segment, (self.ip, self.server_port))
 
     def request_to_server(self):
+        # Searching for server
         self.logger.ok_log("[!] Searching for server..")
         segment = Segment()
         segment.set_flag([True, True, True])
@@ -146,6 +147,7 @@ class Client:
         
 
 
+# Main driver
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("port", help="Client port", type=int)

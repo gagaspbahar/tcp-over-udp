@@ -50,15 +50,6 @@ class Server:
     def send(self, segment: Segment, address: Address):                                             
         self.connection.send_data(segment, address.tuple())
 
-    def receive(self):
-        segment, addr = self.connection.listen_single_segment()
-        if (segment.payload):
-            self.logger.ask_log(f"[!] Receiving segment from {addr.ip}:{addr.port}")
-        else: 
-            #lov u kak -gagas lyo clau <3
-            pass
-            
-
     def start_file_transfer(self):
         # Handshake & file transfer for all client
         if len(self.clients) == 0:
@@ -142,34 +133,6 @@ class Server:
         self.logger.ok_log(f"[!] Closing connection with {client_addr.ip}:{client_addr.port}")
         self.close_connection(client_addr)
 
-        # Go Back N
-        # N  := window size
-        # Rn := request number
-        # Sn := sequence number
-        # Sb := sequence base
-        # Sm := sequence max
-
-        # function receiver is
-        #     Rn := 0
-        #     Do the following forever:
-        #         if the segment received = Rn and the segment is error free then
-        #             Accept the segment and send it to a higher layer
-        #             Rn := Rn + 1
-        #         else
-        #             Refuse segment
-        #         Send acknowledgement for last received segment
-
-        # function sender is
-        #     Sb := 0
-        #     Sm := N + 1
-        #     Repeat the following steps forever:
-        #         if you receive an ack number where Rn > Sb then
-        #             Sm := (Sm − Sb) + Rn
-        #             Sb := Rn
-        #         if no segment is in transmission then
-        #             Transmit segments where Sb ≤ Sn ≤ Sm.  
-        #             segments are transmitted in order.
-
         
     def close_connection(self, client_addr : Address):
         # Send FIN to client
@@ -244,6 +207,7 @@ class Server:
 
 
 
+# Main driver
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("port", help="Server port", type=int)
