@@ -113,10 +113,10 @@ class Client:
                 if (Sn <= Rn):
                     # Accept the segment
                     # Send segment to a higher layer
-                    last_received = len(self.file) - 1
+                    last_received = len(self.file)
 
                     # Handle file order when ACK Lost
-                    if (last_received == Sn - 1):
+                    if (last_received == Sn):
                         self.file.append(file_segment.get_payload())
                         self.logger.ok_log(f"[!] Segment {Sn} received and added to buffer.")
                         
@@ -126,9 +126,9 @@ class Client:
                     ack.set_flag([False, True, False])
                     
                     # Rn := Rn + 1
-                    self.logger.ask_log(f"[!] Sending ACK to server. Sequence number = {Sn}")
                     self.send(ack)
-                    Rn = len(self.file) + 1
+                    Rn = last_received + 1
+                    self.logger.ask_log(f"[!] Sending ACK to server. Sequence number = {Sn}. Request number now = {Rn}")
 
                 else:
                     # Refuse segment
