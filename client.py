@@ -86,7 +86,6 @@ class Client:
         N = config.WINDOW_SIZE
         Rn = 0
         Sn = 0
-        Sb = 0
 
         while True: 
             self.connection.set_timeout(config.TIMEOUT)
@@ -115,8 +114,6 @@ class Client:
                     # Accept the segment
                     # Send segment to a higher layer
                     last_received = len(self.file)
-                    print("last_received", last_received)
-                    print("Sn", Sn)
 
                     # Handle file order when ACK Lost
                     if (last_received == Sn):
