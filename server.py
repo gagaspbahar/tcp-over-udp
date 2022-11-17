@@ -16,6 +16,8 @@ class Server:
         self.connection = Connection(self.ip, self.port)
         self.clients = []
         self.logger = Logger("Server")
+        self.filebytes = open(self.filepath, "rb").read()
+        self.byte_array = util.partition_data(self.filebytes)
         self.logger.ok_log(f"[!] Server is running on port {self.port}")
 
     def listen_for_clients(self):
@@ -76,24 +78,24 @@ class Server:
     def file_transfer(self, client_addr : "tuple['str', 'int']"):
         # File transfer, server-side, Send file to 1 client
         self.logger.ask_log("[!] Initiating file transfer...")
-        filebytes = open(self.filepath, "rb").read()
-        byte_array = util.partition_data(filebytes)
+        # filebytes = open(self.filepath, "rb").read()
+        # byte_array = util.partition_data(filebytes)
 
         N = config.WINDOW_SIZE
         segment_number = 0
         segment_base = 0
         sequence_max = N - 1
         
-        segment_count = len(byte_array)
+        segment_count = len(self.byte_array)
 
         while True:
             # Send N segment
             while segment_base <= segment_number <= sequence_max and segment_number < segment_count:
                 segment = Segment()
                 segment.set_seq_number(segment_number)
-                if segment_number >= len(byte_array):
+                if segment_number >= len(self.byte_array):
                     break
-                segment.set_payload(byte_array[segment_number])
+                segment.set_payload(self.byte_array[segment_number])
                 self.send(segment, client_addr)
                 self.logger.ask_log(f"[!] Sending segment {segment_number} to client {client_addr.ip}:{client_addr.port}")
                 segment_number += 1
